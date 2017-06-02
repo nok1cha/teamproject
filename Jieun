@@ -7,7 +7,8 @@
 제한사항 : 해당 사항 없음
 오류처리 : Visual Studio 에서 빌드 할때 증분링크사용을 아니요로 설정해 주어야 한다.
 이력사항 : 2015-12-1 : ABHISHEK BIND - 최초 작성
-		  2017-04-26 ~ 2017-05-07 : 박 지은 - 시작화면,종료화면 추가 
+		  2017-04-26 ~ 2017-05-07 : 박 지은 - 시작화면,종료화면 추가
+		  2017-05-31 ~ 2017-06-02 : 박 지은 - 시작화면에 말선택메뉴(이정은 작성),규칙 설명메뉴 부분을 합침
 */
 
 #include <iostream>
@@ -22,7 +23,12 @@ int stage=1;		// 시작화면(1), 게임화면(2), 종료화면(3)으로 나눔,
 int board[3][3];	// 게임 보드판
 int turn;			// 현재의 턴(player1 or player2)
 int result;			// 게임의 결과
-bool over;			// 게임 종료 여부
+bool over;			// 게임 종료 여부  
+bool finish1=false; //player1말 선택이 끝났는가를 알리는 변수  
+bool finish2=false; //player2의 말 선택이 끝났는가를 알리는 변수  
+int kind1; //player1의 말을 나타내는 변수  
+int kind2; //player2의 말을 나타내는 변수 
+const GLfloat size = 2.0;
 
 void DrawCircle(float cx, float cy, float r, int num_segments); //말 선택 메뉴에 이 함수를 쓰기 위해 미리 함수 원형을 선언함
 void DrawCross(float cx, float cy);//말 선택 메뉴에 이 함수를 쓰기 위해 미리 함수 원형을 선언함
@@ -216,6 +222,12 @@ void Rule(int x,int y)
 */
 void OnKeyPress(unsigned char key,int x,int y)
 {
+	//'o'키를 누르면 Player1의 말이 결정됨
+	if(stage==4&& key=='o')
+	{
+		finish1=true;
+	}
+	
 	switch(key)
 	{
 		case 'y':
@@ -232,14 +244,15 @@ void OnKeyPress(unsigned char key,int x,int y)
 			exit(0);
 		}
 		break;
-		default:
-			exit(0);
+
 	}
 }
 
 /*
 	마우스함수 : stage가 1일때 start버튼을 누르면 게임 시작으로 stage가 2로 넘어감
 	    stage가 2일때 player가 누른 자리에 아무 말도 놓여 있지 않을때 자신의 말을 놓고 turn을 넘겨줌
+		stage가 4일때 말선택 후 CLOSE 버튼을 누르면 stage1로 넘어감
+		stage가 5일때 규칙 설명 메뉴의 CLOSE 버튼을 누르면 stage1로 넘어감
 */
 void OnMouseClick(int button,int state,int x,int y)	
 {
@@ -251,7 +264,16 @@ void OnMouseClick(int button,int state,int x,int y)
 			stage=2;
 			glutPostRedisplay();
 		}
-
+		else if(button==GLUT_LEFT_BUTTON && state==GLUT_DOWN && x>10 && x< 140 && y>190 && y<340)
+		{
+			stage=4;
+			glutPostRedisplay();
+		}
+		else if(button==GLUT_LEFT_BUTTON && state==GLUT_DOWN && x>160 && x< 290 && y>190 && y<340)
+		{
+			stage=5;
+			glutPostRedisplay();
+		}
 	}
 	else if(stage==2)
 	{
@@ -275,7 +297,47 @@ void OnMouseClick(int button,int state,int x,int y)
 			}
 		}
 	}
-	
+	else if(stage==4)
+	{
+		//Player1의 말선택
+		if(finish1==false&& button==GLUT_LEFT_BUTTON && state == GLUT_DOWN)   
+		{    
+			if(x>22.3 && x<81.7 && y>75 && y < 122)       
+				kind1=1;    
+			else if(x>90 && x<150 && y>70 &&y<150)
+				kind1=2;      
+			else if(x>165 && x<215 && y>75 && y<125)  
+				kind1=3;
+			else if(x>225 && x<275 &&y>75 && y<125)
+				kind1=4;
+		} 
+
+		//Player1의 말선택이 끝난 후 Player2의 말선택
+		if(finish1==true &&finish2==false&& button==GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
+		{   
+			if(x>22.3 && x<81.7 && y>91 && y < 122)      
+				kind2=1;    
+			else if(x>90 && x<150 && y>70 &&y<150) 
+				kind2=2;      
+			else if(x>165 && x<215 && y>75 && y<125)  
+				kind2=3;
+			else if(x>225 && x<275 &&y>75 && y<125)
+				kind2=4;
+			finish2=true;
+		}
+
+		if(button==GLUT_LEFT_BUTTON && state==GLUT_DOWN && x>120 && x<190 && y>290 && y<310)
+		{
+			stage=1;
+		}
+	}
+	else if(stage==5)
+	{
+		if(button==GLUT_LEFT_BUTTON && state==GLUT_DOWN && x>20 && x<90 && y>310 && y<330)
+		{
+			stage=1;
+		}
+	}
 }
 
 /*
@@ -313,7 +375,33 @@ void DrawLines()
 }
 
 /*
-	Player1 말 모양인 X를 그림
+	말 모양 ▼를 그림
+*/
+void Triangle(int x,int y,int r) 
+{    
+	glBegin(GL_POLYGON);      
+		glVertex2f(x, y+r+size);    
+		glVertex2f(x + r*cos(330* PI / 180)-size, y + r*sin(330* PI / 180)-size);    
+		glVertex2f(x + r*cos(210* PI / 180)+size, y + r*sin(210* PI / 180)-size);  
+	glEnd(); 
+} 
+
+/*
+	말 모양 ■를 그림
+*/
+void Rectangular(int x,int y, int r) 
+{     
+	glBegin(GL_POLYGON);    
+		glVertex2f(x + r, y + r);    
+		glVertex2f(x - r, y + r);    
+		glVertex2f(x - r, y - r);   
+		glVertex2f(x + r, y - r);   
+	glEnd(); 
+} 
+
+
+/*
+	말 모양 X를 그림
 */
 void DrawCross(float cx, float cy)
 {
@@ -326,7 +414,7 @@ void DrawCross(float cx, float cy)
 }
 
 /*
-	Player2 말 모양인 O를 그림
+	말 모양인 O를 그림
 */
 void DrawCircle(float cx, float cy, float r, int num_segments) 
 {
@@ -336,18 +424,17 @@ void DrawCircle(float cx, float cy, float r, int num_segments)
         float theta;
 	theta = 2.0f * PI* float(i);
 	theta = theta / float(num_segments);//현재 각도를 얻음 
-        float x = r * cosf(theta);// x 값 계산 
-        float y = r * sinf(theta);// y 값 계산
+        float x = r * cosf(theta); 
+        float y = r * sinf(theta);
         glVertex2f(x + cx, y + cy);
     }
     glEnd();
 }
 
-
 /*
-	보드판 안에 X,O를 그리는 함수
+	보드판 안에 각 플레이어의 말을 그리는 함수
 */
-void DrawXO()
+void Draw()
 {
 	for(int i=0;i<3;i++)
 	{
@@ -355,13 +442,41 @@ void DrawXO()
 		{
 			if(board[i][j]==1)
 			{
+				if(kind1==1)
+				{
+					Triangle(50+j*100,100+i*100,30);
+				}
+				else if(kind1==2)
+				{
+					Rectangular(50+j*100,100+i*100,30);
+				}
+				else if(kind1==3)
+				{
 				DrawCross(50+j*100,100+i*100);
-				
+				}
+				else if(kind1==4)
+				{
+					DrawCircle(50 + j*100 , 100 + i*100 , 25 , 15);
+				}
 			}
 			else if(board[i][j]==2)
 			{
-				
-				DrawCircle(50 + j*100 , 100 + i*100 , 25 , 15);
+				if(kind2==1)
+				{
+					Triangle(50+j*100,100+i*100,30);
+				}
+				else if(kind2==2)
+				{
+					Rectangular(50+j*100,100+i*100,30);
+				}
+				else if(kind2==3)
+				{
+				DrawCross(50+j*100,100+i*100);
+				}
+				else if(kind2==4)
+				{
+					DrawCircle(50 + j*100 , 100 + i*100 , 25 , 15);
+				}
 			}
 		}
 	}
@@ -460,7 +575,7 @@ void Display()
 			DrawString(GLUT_BITMAP_HELVETICA_18, "Player2's turn", 100, 30);	
 	
 		DrawLines();
-		DrawXO();
+		Draw();
 	
 		//승리자 검사 
 		if(CheckWinner() == true)
@@ -504,6 +619,68 @@ void Display()
 				DrawString(GLUT_BITMAP_HELVETICA_18, "Player2 wins!", 95, 185);
 				
 			DrawString(GLUT_BITMAP_HELVETICA_18, "Do you want to continue? (y/n)", 40, 210);
+	}
+	else if(stage==4)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.7,0.4,0.7,1);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"CHOOSE",120,30);
+		Triangle(50,90,30);    
+		Rectangular(120,100,30);    
+		DrawCross(190,100);
+		DrawCircle(250,100,25,15);
+		
+		DrawString(GLUT_BITMAP_HELVETICA_18,"PLAYER1",45,180);    
+		DrawString(GLUT_BITMAP_HELVETICA_18,"PLAYER2",200,180);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"CLOSE",120,300); 
+		glFlush();  
+		switch(kind1)    
+		{  
+		case 1:     
+			Triangle(50,230,30); 
+			break; 
+		case 2:
+			Rectangular(50,230,30); 
+			break;  
+		case 3:   
+			DrawCross(50,230); 
+			break;  
+		case 4:
+			DrawCircle(50,230,30,15);
+			break;
+		}  
+		switch(kind2)     
+		{  
+		case 1:       
+			Triangle(250,230,30);       
+			break;  
+		case 2: 
+			Rectangular(250,230,30); 
+			break;  
+		case 3:    
+			DrawCross(250,230);     
+			break;
+		case 4:
+			DrawCircle(250,230,30,15);
+			break;
+		}    
+	}
+	else if(stage==5)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.7,0.4,0.7,1);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"A game that wins when my three",20,30);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"symbols are placed side by side.",20,50);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"Players should not have",20,80);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"the same symbol shape.",20,100);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"The player who won more",20,130);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"games in 9 games is the winner.",20,150);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"Please select the sign and start",20,180);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"the game!",20,200);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"Select the symbol for player1,",20,230);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"press the 'o' key, and select",20,250);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"the player2 symbol.",20,270);
+		DrawString(GLUT_BITMAP_HELVETICA_18,"CLOSE",20,320);
 	}
 	glutSwapBuffers();
 }
