@@ -1,3 +1,6 @@
+/*게임판 확장, 게임 규칙 변경, 그래픽개선, 스코어 카운트*/
+/*13011195 김성훈 2조 2017-05-16~2017-06-02 작업*/
+/*project 5th*/
 #include <stdlib.h>
 #include <glut.h>
 #include <iostream>
