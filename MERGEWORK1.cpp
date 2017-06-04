@@ -1,4 +1,4 @@
-/*second merge (seonghoon file + jieun file) + jeongeun file)*/
+/*Third merge  (seonghoon+jieun+jeongeun)file + boseoung file merging)*/
 #include <stdlib.h>
 #include <glut.h>
 #include <iostream>
@@ -14,8 +14,8 @@ int stage = 1;		// 시작화면(1), 게임화면(2), 종료화면(3)으로 나눔, 첫 화면은 시�
 
 bool finish1 = false; //player1말 선택이 끝났는가를 알리는 변수  
 bool finish2 = false; //player2의 말 선택이 끝났는가를 알리는 변수  
-int kind1=1; //player1의 말을 나타내는 변수  
-int kind2=2; //player2의 말을 나타내는 변수 
+int kind1 = 1; //player1의 말을 나타내는 변수  
+int kind2 = 2; //player2의 말을 나타내는 변수 
 const GLfloat size = 2.0;
 
 int bigboard[3][3];
@@ -28,7 +28,9 @@ int turn;			// 현재 player의 턴을 나타냄.
 int result;			// 게임 결과
 bool over;			// 게임 종료 여부
 
+int timer1 = (int)time(NULL); //first start time
 
+int timer2 = 0; // time limit, timer (int)time(NULL)
 
 					/*
 					START 버튼
@@ -313,9 +315,9 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 		//START버튼을 누르면 게임 화면으로 넘어감
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && x>10 && x<290 * 1.5 && y>20 && y<160 * 1.5)
 		{
-			
+
 			stage = 3;
-			
+
 			glutPostRedisplay();
 		}
 		else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && x>10 && x< 140 * 1.5 && y>190 * 1.5 && y<340 * 1.5)
@@ -334,13 +336,13 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 	{
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
-			if (x > 0 && x < 112 && y > 45 && y < 230  && kind2 != 1) //세모 선택했을 경우      
+			if (x > 0 && x < 112 && y > 45 && y < 230 && kind2 != 1) //세모 선택했을 경우      
 				kind1 = 1;
 			else if (x > 112 && x < 224 && y > 45 && y < 230 && kind2 != 2)//네모 선택했을 경우 
 				kind1 = 2;
-			else if (x > 224 && x < 336 && y > 45 && y < 230  && kind2 != 3)//엑스 선택했을 경우  
+			else if (x > 224 && x < 336 && y > 45 && y < 230 && kind2 != 3)//엑스 선택했을 경우  
 				kind1 = 3;
-			else if (x > 336 && x < 448 && y > 45 && y < 230  && kind2 != 4)//원 선택했을 경우  
+			else if (x > 336 && x < 448 && y > 45 && y < 230 && kind2 != 4)//원 선택했을 경우  
 				kind1 = 4;
 			if (x > 150 && x < 250 && y < 45 * 1.5)
 				stage = 1;
@@ -348,11 +350,11 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 		}
 		if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 		{
-			if (x > 0 && x < 112 && y > 45 && y < 230  && kind1 != 1) //세모 선택했을 경우      
+			if (x > 0 && x < 112 && y > 45 && y < 230 && kind1 != 1) //세모 선택했을 경우      
 				kind2 = 1;
-			else if (x > 112 && x < 224 && y > 45 && y < 230  && kind1 != 2)//네모 선택했을 경우 
+			else if (x > 112 && x < 224 && y > 45 && y < 230 && kind1 != 2)//네모 선택했을 경우 
 				kind2 = 2;
-			else if (x > 224 && x < 336 && y > 45 && y < 230  && kind1 != 3)//엑스 선택했을 경우  
+			else if (x > 224 && x < 336 && y > 45 && y < 230 && kind1 != 3)//엑스 선택했을 경우  
 				kind2 = 3;
 			else if (x > 336 && x < 448 && y > 45 && y < 230 && kind1 != 4)//원 선택했을 경우  
 				kind2 = 4;
@@ -362,7 +364,7 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 
 	else if (stage == 3)
 	{
-		
+
 		if (over == false && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)// 오른쪽 버튼 시 동작
 		{
 
@@ -372,6 +374,7 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 				{
 					board[(y - 50) / 50][x / 50] = 1;
 					turn = 2;//그 후 플레이어를 다음 턴으로 넘김
+					timer1 = (int)time(NULL); //restart timer
 				}
 			}
 			else if (turn == 2)
@@ -380,6 +383,7 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 				{
 					board[(y - 50) / 50][x / 50] = 2;
 					turn = 1;
+					timer1 = (int)time(NULL); //restart timer
 				}
 			}
 			for (int i = 0; i < 9; i++)
@@ -728,7 +732,7 @@ void checkgameover()
 			result = 1;
 		}
 	}
-	else if (CheckIfDraw1() == true|| CheckIfDraw2() == true)// 누구의 승리로 끝나지 않고 칸이 다 차버린경우.
+	else if (CheckIfDraw1() == true || CheckIfDraw2() == true)// 누구의 승리로 끝나지 않고 칸이 다 차버린경우.
 	{
 		over = true;//게임오버를 표시함
 		result = 0;//결과창을 0으로 바꿈.
@@ -786,7 +790,7 @@ void selectstage()
 	switch (kind1)
 	{
 	case 1:
-		Triangle(100*1.5, 230 * 1.5, 30 * 1.5);
+		Triangle(100 * 1.5, 230 * 1.5, 30 * 1.5);
 		break;
 	case 2:
 		Rectangular(100 * 1.5, 230 * 1.5, 30 * 1.5);
@@ -828,7 +832,7 @@ void Display()
 		Rule(0, 0);
 		StartButton();
 	}
-	
+
 	if (stage == 2)
 	{
 		selectstage();
@@ -844,6 +848,47 @@ void Display()
 		explain();
 
 		checkgameover();
+
+		timer2 = (int)time(NULL); // real time
+
+		switch (timer2 - timer1) { // time passed
+		case 0: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 10", 200, 30); break;
+		case 1: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 10", 200, 30); break;
+		case 2: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 09", 200, 30); break;
+		case 3: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 08", 200, 30); break;
+		case 4: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 07", 200, 30); break;
+		case 5: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 06", 200, 30); break;
+		case 6: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 05", 200, 30); break;
+		case 7: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 04", 200, 30); break;
+		case 8: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 03", 200, 30); break;
+		case 9: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 02", 200, 30); break;
+		case 10: DrawString(GLUT_BITMAP_HELVETICA_18, "00 : 01", 200, 30); break; // display left seconds
+		
+		case 11: 
+			bool randompick = true;
+
+
+			while (randompick)
+			{
+				srand((unsigned)time(NULL));
+				int a = rand() % 9;
+				int b = rand() % 9;
+
+				if (board[a][b] == 0)
+				{
+					board[a][b] = turn;
+					printf("%d", board[a][b]);
+
+					randompick = false;
+				}
+
+			}
+
+
+			if (turn == 1) turn = 2; else turn = 1;// over turn if not finished in limit seconds
+			timer1 = (int)time(NULL); break;  //intialize time
+		}
+
 
 	}
 	glutSwapBuffers();
@@ -886,6 +931,7 @@ Driver Function
 */
 int main(int argc, char **argv)
 {
+	
 	Intialize();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
