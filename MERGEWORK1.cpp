@@ -1,4 +1,4 @@
-/*First merge, seonghoon+jieun file*/
+/*second merge (seonghoon file + jieun file) + jeongeun file)*/
 #include <stdlib.h>
 #include <glut.h>
 #include <iostream>
@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
+#include <Windows.h>
 
 #define PI 3.141592 //PI를 3.141592로 정의해둠
 
@@ -13,8 +14,8 @@ int stage = 1;		// 시작화면(1), 게임화면(2), 종료화면(3)으로 나눔, 첫 화면은 시�
 
 bool finish1 = false; //player1말 선택이 끝났는가를 알리는 변수  
 bool finish2 = false; //player2의 말 선택이 끝났는가를 알리는 변수  
-int kind1=3; //player1의 말을 나타내는 변수  
-int kind2=4; //player2의 말을 나타내는 변수 
+int kind1=1; //player1의 말을 나타내는 변수  
+int kind2=2; //player2의 말을 나타내는 변수 
 const GLfloat size = 2.0;
 
 int bigboard[3][3];
@@ -29,9 +30,9 @@ bool over;			// 게임 종료 여부
 
 
 
-/*
-START 버튼
-*/
+					/*
+					START 버튼
+					*/
 void StartButton()
 {
 	glColor3f(1, 1, 1);
@@ -115,6 +116,16 @@ void DrawCross(float cx, float cy)
 	glEnd();
 }
 
+void DrawCross1(float cx, float cy)
+{
+	glBegin(GL_LINES);
+	glVertex2f(cx - 40, cy - 40);
+	glVertex2f(cx + 40, cy + 40);
+	glVertex2f(cx - 40, cy + 40);
+	glVertex2f(cx + 40, cy - 40);
+	glEnd();
+}
+
 void DrawCircle(float cx, float cy, float r, int num_segments)//동그라미 그리기
 {
 	glBegin(GL_LINE_LOOP);
@@ -149,7 +160,14 @@ void Select(int x, int y, int r)
 	glVertex2f(140 * 1.5, 190 * 1.5);
 	glEnd();
 	DrawCircle(45 * 1.5, 240 * 1.5, 25 * 1.5, 15 * 1.5);
-	DrawCross(105 * 1.5, 300 * 1.5);
+
+	glBegin(GL_LINES);
+	glVertex2f(105 * 1.5 - 25, 300 * 1.5 - 25);
+	glVertex2f(105 * 1.5 + 25, 300 * 1.5 + 25);
+	glVertex2f(105 * 1.5 - 25, 300 * 1.5 + 25);
+	glVertex2f(105 * 1.5 + 25, 300 * 1.5 - 25);
+	glEnd();
+
 }
 
 /*
@@ -281,11 +299,10 @@ void OnKeyPress(unsigned char key, int x, int y)//게임 오버 시 키보드 버튼 지정.
 	case 'n'://게임오버 후 n 누를 시 종료.
 		if (over == true)
 		{
-			exit(1);
+			stage = 1;
 		}
 		break;
-	default:
-		exit(1);
+
 	}
 }
 
@@ -294,14 +311,16 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 	if (stage == 1)
 	{
 		//START버튼을 누르면 게임 화면으로 넘어감
-		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && x>10 && x<290*1.5 && y>20 && y<160 * 1.5)
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && x>10 && x<290 * 1.5 && y>20 && y<160 * 1.5)
 		{
+			
 			stage = 3;
+			
 			glutPostRedisplay();
 		}
 		else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && x>10 && x< 140 * 1.5 && y>190 * 1.5 && y<340 * 1.5)
 		{
-			stage = 4;
+			stage = 2;
 			glutPostRedisplay();
 		}
 		else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && x>160 * 1.5 && x< 290 * 1.5 && y>190 * 1.5 && y<340 * 1.5)
@@ -310,10 +329,43 @@ void OnMouseClick(int button, int state, int x, int y)//게임시작 후 마우스 버튼 
 			glutPostRedisplay();
 		}
 	}
-	if (stage == 3)
+
+	else if (stage == 2)
 	{
-		if (over == false && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN || state == GLUT_UP)// 오른쪽 버튼 시 동작
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
+			if (x > 0 && x < 112 && y > 45 && y < 230  && kind2 != 1) //세모 선택했을 경우      
+				kind1 = 1;
+			else if (x > 112 && x < 224 && y > 45 && y < 230 && kind2 != 2)//네모 선택했을 경우 
+				kind1 = 2;
+			else if (x > 224 && x < 336 && y > 45 && y < 230  && kind2 != 3)//엑스 선택했을 경우  
+				kind1 = 3;
+			else if (x > 336 && x < 448 && y > 45 && y < 230  && kind2 != 4)//원 선택했을 경우  
+				kind1 = 4;
+			if (x > 150 && x < 250 && y < 45 * 1.5)
+				stage = 1;
+
+		}
+		if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+		{
+			if (x > 0 && x < 112 && y > 45 && y < 230  && kind1 != 1) //세모 선택했을 경우      
+				kind2 = 1;
+			else if (x > 112 && x < 224 && y > 45 && y < 230  && kind1 != 2)//네모 선택했을 경우 
+				kind2 = 2;
+			else if (x > 224 && x < 336 && y > 45 && y < 230  && kind1 != 3)//엑스 선택했을 경우  
+				kind2 = 3;
+			else if (x > 336 && x < 448 && y > 45 && y < 230 && kind1 != 4)//원 선택했을 경우  
+				kind2 = 4;
+
+		}
+	}
+
+	else if (stage == 3)
+	{
+		
+		if (over == false && button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)// 오른쪽 버튼 시 동작
+		{
+
 			if (turn == 1)//플레이어1 차례일때
 			{
 				if (board[(y - 50) / 50][x / 50] == 0)// 1칸에 100을 차지하고 50은 위의 글자부분을 커버함.만일 클릭한 그 칸의 배열이 0이면 플레이어 1일때 그 클릭한 칸에 해당하는 배열을 1로둠
@@ -532,7 +584,7 @@ bool BigCheckWinner()//수직 수평 대각선의 배열값을 검사함.
 	return false;
 }
 
-bool CheckIfDraw()
+bool CheckIfDraw1()
 {
 	int i, j;
 	bool draw;
@@ -542,6 +594,27 @@ bool CheckIfDraw()
 		{
 			if (bigboard[i][j] == 0)
 				return false;//어느 한칸이라도 빈칸이 있으면 false를 나타냄
+
+
+
+		}
+	}
+	return true;// 모든 보드판의 배열 값을 검사 한 후 전부 0이 아닌 값을 가지고 있다면 true값을 도출함.
+}
+
+bool CheckIfDraw2()
+{
+	int i, j;
+	bool draw;
+	for (i = 0; i<9; i++)
+	{
+		for (j = 0; j<9; j++)
+		{
+			if (board[i][j] == 0)
+				return false;//어느 한칸이라도 빈칸이 있으면 false를 나타냄
+
+
+
 		}
 	}
 	return true;// 모든 보드판의 배열 값을 검사 한 후 전부 0이 아닌 값을 가지고 있다면 true값을 도출함.
@@ -655,46 +728,90 @@ void checkgameover()
 			result = 1;
 		}
 	}
-	else if (CheckIfDraw() == true)// 누구의 승리로 끝나지 않고 칸이 다 차버린경우.
+	else if (CheckIfDraw1() == true|| CheckIfDraw2() == true)// 누구의 승리로 끝나지 않고 칸이 다 차버린경우.
 	{
 		over = true;//게임오버를 표시함
 		result = 0;//결과창을 0으로 바꿈.
 	}
 	if (over == true)//게임오버가 된 상태에서
 	{
-		DrawString(GLUT_BITMAP_HELVETICA_18, "Game Over", 100, 160);//게임오버의 문자열을 출력
+		glColor3f(1, 1, 1);
+		DrawString(GLUT_BITMAP_HELVETICA_18, "Game Over", 50, 250);//게임오버의 문자열을 출력
 
 		if (result == 0)
 		{
 			if (player1 > player2)
 			{
-				DrawString(GLUT_BITMAP_HELVETICA_18, "Player1 wins", 95, 185);//플레이어1이 이겼을경우.
+				DrawString(GLUT_BITMAP_HELVETICA_18, "Player1 wins", 150, 200);//플레이어1이 이겼을경우.
 			}
 
 			if (player1 < player2)
 			{
-				DrawString(GLUT_BITMAP_HELVETICA_18, "Player2 wins", 95, 185);//플레이어2가 이겼을경우.
+				DrawString(GLUT_BITMAP_HELVETICA_18, "Player2 wins", 150, 200);//플레이어2가 이겼을경우.
 			}
 
 			if (player1 == player2)
 			{
-				DrawString(GLUT_BITMAP_HELVETICA_18, "It's a draw", 110, 185);//비겼을 경우
+				DrawString(GLUT_BITMAP_HELVETICA_18, "It's a draw", 150, 200);//비겼을 경우
 			}
 
 		}
 
 		if (result == 1)
 		{
-			DrawString(GLUT_BITMAP_HELVETICA_18, "Player1 wins", 95, 185);//플레이어1이 이겼을경우.
+			DrawString(GLUT_BITMAP_HELVETICA_18, "Player1 wins", 150, 200);//플레이어1이 이겼을경우.
 		}
 
 		if (result == 2)
 		{
-			DrawString(GLUT_BITMAP_HELVETICA_18, "Player2 wins", 95, 185);//플레이어2가 이겼을경우.
+			DrawString(GLUT_BITMAP_HELVETICA_18, "Player2 wins", 150, 200);//플레이어2가 이겼을경우.
 		}
 
-		DrawString(GLUT_BITMAP_HELVETICA_18, "Do you want to continue (y/n)", 40, 210);//재시작 할건지 물어봄
+		DrawString(GLUT_BITMAP_HELVETICA_18, "Do you want to continue (y/n)", 150, 280);//재시작 할건지 물어봄
 
+	}
+}
+
+void selectstage()
+{
+	glColor3f(0, 0, 0);
+	DrawString(GLUT_BITMAP_HELVETICA_18, "BACK to START", 160, 30 * 1.5);
+	Triangle(56, 100 * 1.5, 30 * 1.5);
+	Rectangular(168, 100 * 1.5, 30 * 1.5);
+	DrawCross1(280, 100 * 1.5);
+	DrawCircle(392, 100 * 1.5, 30 * 1.5, 15 * 1.5);
+	DrawString(GLUT_BITMAP_HELVETICA_18, "PLAYER1", 75 * 1.5, 180 * 1.5);
+	DrawString(GLUT_BITMAP_HELVETICA_18, "PLAYER2", 175 * 1.5, 180 * 1.5);
+	glFlush();
+	switch (kind1)
+	{
+	case 1:
+		Triangle(100*1.5, 230 * 1.5, 30 * 1.5);
+		break;
+	case 2:
+		Rectangular(100 * 1.5, 230 * 1.5, 30 * 1.5);
+		break;
+	case 3:
+		DrawCross1(100 * 1.5, 230 * 1.5);
+		break;
+	case 4:
+		DrawCircle(100 * 1.5, 230 * 1.5, 30 * 1.5, 15 * 1.5);
+		break;
+	}
+	switch (kind2)
+	{
+	case 1:
+		Triangle(200 * 1.5, 230 * 1.5, 30 * 1.5);
+		break;
+	case 2:
+		Rectangular(200 * 1.5, 230 * 1.5, 30 * 1.5);
+		break;
+	case 3:
+		DrawCross1(200 * 1.5, 230 * 1.5);
+		break;
+	case 4:
+		DrawCircle(200 * 1.5, 230 * 1.5, 30 * 1.5, 15 * 1.5);
+		break;
 	}
 }
 
@@ -702,14 +819,22 @@ void Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(0, 0, 0);
+
 	if (stage == 1)
 	{
-		
+
 		glClearColor(0.7, 0.4, 0.7, 1);
 		Select(0, 0, 0);
 		Rule(0, 0);
 		StartButton();
 	}
+	
+	if (stage == 2)
+	{
+		selectstage();
+
+	}
+
 
 	if (stage == 3)
 	{
