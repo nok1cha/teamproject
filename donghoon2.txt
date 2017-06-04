@@ -1,0 +1,23 @@
+************Click the O and X button************
+
+
+Select shape with left button -> Select symbol of player1
+
+Select the shape with the right button -> Select the symbol of player2
+
+
+*************Click the Start button************ 
+ 
+It is possible to place any symbol freely in 9 * 9 board.
+
+3 * 3 If you draw 3 symbols in horizontal, vertical, and diagonal lines inside the board, you win the 3 * 3 board, 
+and the board changes to the winning player color.
+ 
+The changed 3 * 3 board is treated as another symbols, 
+and if the 3 * 3 board are connected in horizontal, vertical, and diagonal lines, the final win is achieved
+
+***************Precautions****************
+
+There is a time limit of 10 seconds per turn.
+
+If anybody do not win until the end, you must fill all the spaces to finish the game.
