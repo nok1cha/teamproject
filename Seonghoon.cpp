@@ -434,19 +434,23 @@ void checkgameover()
 
 void Display()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(1, 1, 1, 1);
-	glColor3f(0, 0, 0);
-	
 
 
-	shadeboard();
-	DrawLines();//칸을 나누는 선 그리기 함수
-	DrawXO();//말을 그리는 함수
-	explain();
+	if (playing == 2)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(1, 1, 1, 1);
+		glColor3f(0, 0, 0);
 
-	checkgameover();
 
+
+		shadeboard();
+		DrawLines();//칸을 나누는 선 그리기 함수
+		DrawXO();//말을 그리는 함수
+		explain();
+
+		checkgameover();
+	}
 
 	glutSwapBuffers();
 }
